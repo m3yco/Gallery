@@ -15,10 +15,11 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         <Button
+            android:id="@+id/btn_auswahl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=""
-            android:background="@color/colorPrimaryDark"
+            android:background="@drawable/backgr"
             android:onClick="startImageActivity"
             />
 

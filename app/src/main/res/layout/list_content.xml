@@ -4,6 +4,5 @@
     android:layout_height="match_parent"
     android:textColor="@color/colorPrimaryDark"
     android:checkMark="?android:attr/listChoiceIndicatorSingle"
-
     >
 </CheckedTextView>
