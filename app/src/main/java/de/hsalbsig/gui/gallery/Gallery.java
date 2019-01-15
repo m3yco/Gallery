@@ -26,7 +26,7 @@ public class Gallery extends AppCompatActivity {
     private final String[] perms = {"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"};
     private String selectedDirectory="";
     private String [] titles = {SCREENSHOT_DIR, CAMERA_DIR, "Choose other directory..."};
-    // Wird spaeter gebraucht
+
     private String pathScreenShots =
             Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/Screenshots";
@@ -40,17 +40,17 @@ public class Gallery extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list_content);
+        setContentView(R.layout.activity_gallery);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         list = findViewById(android.R.id.list);
         btn_auswahl = findViewById(R.id.btn_auswahl);
         btn_auswahl.setEnabled(false);
-        // Auswahlmoeglichkeiten (hier nur 2) in ArrayAdapter ...
+
         ArrayAdapter<String> myList =
                 new ArrayAdapter<String>(this,R.layout.list_content,
                         titles);
-        // ArrayAdapter mit ListView verknuepfen
+
         list.setAdapter(myList);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -138,7 +138,6 @@ public class Gallery extends AppCompatActivity {
             if(granted != PackageManager.PERMISSION_GRANTED) {
                 result = false;
             }
-            // granted = getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         return result;
     }
