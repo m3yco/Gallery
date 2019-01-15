@@ -1,15 +1,20 @@
 package de.hsalbsig.gui.gallery;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -18,26 +23,61 @@ public class Gallery extends AppCompatActivity {
 
     private final String SCREENSHOT_DIR = "Screenshots";
     private final String CAMERA_DIR = "Camera";
-    private String [] titles = {SCREENSHOT_DIR, CAMERA_DIR};
+    private final String[] perms = {"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"};
+    private String selectedDirectory="";
+    private String [] titles = {SCREENSHOT_DIR, CAMERA_DIR, "Choose other directory..."};
+    // Wird spaeter gebraucht
     private String pathScreenShots =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+            Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/Screenshots";
     private String pathCamera =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "Camera";
+            Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).getAbsolutePath() + "/Camera";
 
     private ListView list;
-    private Button bnt_auswahl;
+    private Button btn_auswahl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.list_content);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         list = findViewById(android.R.id.list);
-        bnt_auswahl = findViewById(R.id.btn_auswahl);
+        btn_auswahl = findViewById(R.id.btn_auswahl);
+        btn_auswahl.setEnabled(false);
+        // Auswahlmoeglichkeiten (hier nur 2) in ArrayAdapter ...
         ArrayAdapter<String> myList =
-                new ArrayAdapter<String>(this, R.layout.list_content, titles);
+                new ArrayAdapter<String>(this,R.layout.list_content,
+                        titles);
+        // ArrayAdapter mit ListView verknuepfen
         list.setAdapter(myList);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String directory = (String)parent.getItemAtPosition(position);
+                switch (directory){
+                    case "Screenshots":
+                        selectedDirectory = pathScreenShots;
+                        btn_auswahl.setEnabled(true);
+                        break;
+                    case "Camera":
+                        selectedDirectory = pathCamera;
+                        btn_auswahl.setEnabled(true);
+                        break;
+                    default:
+                        btn_auswahl.setEnabled(false);
+                }
+            }
+        });
+        if(checkPermissions() == false) {
+            try {
+                ActivityCompat.requestPermissions((Activity) Gallery.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+            } catch (Exception e){
+                e.printStackTrace();
+                throw e;
+            }
+        }
     }
 
     @Override
@@ -53,28 +93,53 @@ public class Gallery extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        switch(id){
-            case R.id.action_a:
-                // hier Code für den Button der action_a!
-                break;
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void startListOnClick(){
+        list = findViewById(android.R.id.list);
+        String listPath = (String) list.getSelectedItem();
+        switch (listPath){
+            case "Screenshots":
+                selectedDirectory = pathScreenShots;
+                break;
+            case "Camera":
+                selectedDirectory = pathCamera;
+                break;
+        }
+    }
+
     public void startImageActivity(View view) {
-        // Hier die SubAct mit Verzeichnisinfo starten
         Intent startnext;
-        startnext = new Intent(Gallery.this, ShowImage.class);
-        // PfadInfo an SubActivity weiterleiten, hier später den tatsächlich ausgewählten Pfad!
-
-        // Bundle enthält die zu übergebenden Informationen
+        startnext = new Intent(Gallery.this,
+                ShowImage.class);
+        // PfadInfo an SubActivity weiterleiten
+        // Hier geben Sie spaeter den tatsaechlich ausgewaehlten Pfad
+        // an!!
+        // Bundle enthaelt die zu uebergebenden Infos ...
         Bundle infos = new Bundle();
-        infos.putStringArray("PATH_INFOS", titles);
+        // ... nach put...
+        infos.putString("SELECTED_DIRECTORY",selectedDirectory);
         startnext.putExtras(infos);
-
-        //Activity starten
+        // Activity starten mit Uebergabe der Infos ...
         this.startActivity(startnext);
+    }
 
+    private boolean checkPermissions() {
+        boolean result = true;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int granted = ContextCompat.checkSelfPermission(Gallery.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            if(granted != PackageManager.PERMISSION_GRANTED) {
+                result = false;
+            }
+            // granted = getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        return result;
     }
 }

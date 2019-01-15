@@ -18,23 +18,18 @@
             android:id="@+id/btn_auswahl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:background="@drawable/backgr"
+            android:text="Show Images"
             android:onClick="startImageActivity"
             />
-
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:choiceMode="singleChoice"
             android:id="@android:id/list"
-            >
-        </ListView>
-
+            />
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_launcher"
             />
-
 </LinearLayout>

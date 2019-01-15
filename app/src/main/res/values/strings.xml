@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Gallery</string>
     <string name="title_activity_show_image">ShowImage</string>
-    <string name="a">Ahhh</string>
+    <string name="action_settings">Settings</string>
 </resources>
